@@ -17,8 +17,14 @@ if "%OPENAI_API_KEY%"=="" (
 echo 🔑 API Key is configured
 echo.
 
+REM Activate virtual environment if it exists
+if exist ".venv\Scripts\activate.bat" (
+    echo 🐍 Activating virtual environment...
+    call .venv\Scripts\activate.bat
+)
+
 echo 🖥️  Starting Backend Server...
-start "Content Creation API" cmd /k "python api_server.py"
+start "Content Creation API" cmd /k "call .venv\Scripts\activate.bat && python api_server.py"
 
 echo ⏳ Waiting for backend to start...
 timeout /t 5 /nobreak >nul

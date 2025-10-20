@@ -41,8 +41,7 @@ import {
   Article as ArticleIcon,
   Image as ImageIcon,
   Publish as PublishIcon,
-  CheckCircle as CheckCircleIcon,
-  Error as ErrorIcon
+  CheckCircle as CheckCircleIcon
 } from '@mui/icons-material';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
@@ -108,11 +107,15 @@ function App() {
 
   useEffect(() => {
     return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
+      // Copy ref values to variables for cleanup
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      const ws = wsRef.current;
+      const interval = progressInterval.current;
+      if (ws) {
+        ws.close();
       }
-      if (progressInterval.current) {
-        clearInterval(progressInterval.current);
+      if (interval) {
+        clearInterval(interval);
       }
     };
   }, []);
@@ -133,16 +136,18 @@ function App() {
 
     try {
       // Start the content creation process
-      const response = await axios.post('/api/create-content', {
+      const response = await axios.post('/api/content/create', {
         topic: topic.trim(),
-        config: config
+        audience: config.audience || 'General',
+        style: config.style || 'Professional',
+        length: config.length || 'Medium'
       });
 
-      if (response.data.success) {
+      if (response.data.task_id) {
         // Start polling for progress
         startProgressPolling(response.data.task_id);
       } else {
-        throw new Error(response.data.error || 'Failed to start content creation');
+        throw new Error('Failed to start content creation');
       }
     } catch (err) {
       setError(err.response?.data?.error || err.message || 'Failed to start content creation');
@@ -154,12 +159,14 @@ function App() {
   const startProgressPolling = (taskId) => {
     progressInterval.current = setInterval(async () => {
       try {
-        const response = await axios.get(`/api/progress/${taskId}`);
+        const response = await axios.get(`/api/content/status/${taskId}`);
         const data = response.data;
         
-        setProgress(data.progress);
+        // Calculate progress based on current step (5 steps total)
+        const calculatedProgress = data.current_step ? (data.current_step / 5) * 100 : 0;
+        setProgress(calculatedProgress);
         setCurrentOperation(data.current_operation || '');
-        setActiveStep(data.current_step);
+        setActiveStep(data.current_step - 1); // Convert to 0-based index for stepper
         
         // Update step results
         if (data.step_results) {

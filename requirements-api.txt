@@ -16,7 +16,8 @@ requests>=2.0,<3
 types-requests>=2.0,<3
 
 # OpenAI API
-openai>=1.51.0,<2
+# Note: openai-agents requires openai>=2.2,<3
+openai>=2.2.0,<3
 
 # Additional utilities for content processing
 markdown>=3.5.0

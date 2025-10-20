@@ -73,8 +73,10 @@ class TaskStatus(BaseModel):
     final_result: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
 
-# Serve React frontend static files
-app.mount("/static", StaticFiles(directory="frontend/build/static"), name="static")
+# Conditionally serve React frontend static files (only if build exists)
+import os
+if os.path.exists("frontend/build/static"):
+    app.mount("/static", StaticFiles(directory="frontend/build/static"), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_frontend():
@@ -86,9 +88,11 @@ async def serve_frontend():
         return HTMLResponse("""
         <html>
             <body>
-                <h1>Content Creation System</h1>
-                <p>Frontend not built. Please run:</p>
+                <h1>Content Creation System - Development Mode</h1>
+                <p><strong>For development:</strong> Start React dev server separately on port 3000</p>
+                <p><strong>For production:</strong> Build the frontend first:</p>
                 <pre>cd frontend && npm install && npm run build</pre>
+                <p>API is running on <a href="/docs">http://localhost:8000/docs</a></p>
             </body>
         </html>
         """)
