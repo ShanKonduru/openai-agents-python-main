@@ -19,15 +19,27 @@ from pydantic import BaseModel
 import uvicorn
 
 # Import our content creation system
-from enhanced_content_system import (
-    create_enhanced_content_workflow,
-    ContentCreationConfig,
-    UserInput,
-    ResearchOutput,
-    MarkdownContent,
-    ImageDescription,
-    PublishedArticle
-)
+try:
+    from enhanced_content_system import (
+        create_enhanced_content_workflow,
+        ContentCreationConfig,
+        UserInput,
+        ResearchOutput,
+        MarkdownContent,
+        ImageDescription,
+        PublishedArticle
+    )
+    CONTENT_SYSTEM_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️  Content creation system not available: {e}")
+    print("🔧 Running in demo mode with mock responses")
+    CONTENT_SYSTEM_AVAILABLE = False
+    
+    # Create mock classes for demo mode
+    class ContentCreationConfig:
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
 
 app = FastAPI(
     title="Content Creation API",

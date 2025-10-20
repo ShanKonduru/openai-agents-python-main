@@ -3,12 +3,26 @@ REM Full-Stack Content Creation System Setup
 echo 🚀 Setting up Full-Stack Content Creation System...
 echo.
 
-echo 📦 Installing Python Backend Dependencies...
-pip install -r requirements-api.txt
+echo 📦 Installing Core Python Dependencies...
+pip install --upgrade pip
+pip install -r requirements-minimal.txt
 if %ERRORLEVEL% neq 0 (
-    echo ❌ Failed to install Python dependencies
+    echo ❌ Failed to install core dependencies
     pause
     exit /b 1
+)
+
+echo 📦 Installing FastAPI Dependencies...
+pip install fastapi uvicorn python-multipart aiofiles python-dotenv markdown
+if %ERRORLEVEL% neq 0 (
+    echo ❌ Failed to install FastAPI dependencies
+    echo 💡 Trying alternative installation...
+    pip install fastapi==0.100.0 uvicorn==0.23.0 python-multipart==0.0.6 aiofiles==23.2.0 python-dotenv==1.0.0 markdown==3.5.0
+    if %ERRORLEVEL% neq 0 (
+        echo ❌ Failed to install API dependencies
+        pause
+        exit /b 1
+    )
 )
 
 echo.

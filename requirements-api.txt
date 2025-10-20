@@ -1,14 +1,23 @@
-# Backend API Requirements
+# Backend API Requirements for Full-Stack Content Creation System
+
+# FastAPI and web server dependencies
 fastapi>=0.104.1
 uvicorn[standard]>=0.24.0
-pydantic>=2.5.0
 python-multipart>=0.0.6
-
-# Core dependencies from the content creation system
-openai-agents-sdk>=0.4.0
-pydantic>=2.5.0
-pathlib
-
-# Additional utilities
-python-dotenv>=1.0.0
 aiofiles>=23.2.0
+python-dotenv>=1.0.0
+
+# Use the same dependencies as the main project
+# (Based on requirements-minimal.txt to avoid conflicts)
+pydantic>=2.10,<3
+griffe>=1.5.6,<2
+typing-extensions>=4.12.2,<5
+requests>=2.0,<3
+types-requests>=2.0,<3
+
+# OpenAI API
+openai>=1.51.0,<2
+
+# Additional utilities for content processing
+markdown>=3.5.0
+pathlib2>=2.3.0
