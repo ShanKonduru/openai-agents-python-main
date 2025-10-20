@@ -1,3 +1,27 @@
+# API Keys and Secrets - NEVER COMMIT THESE!
+.env
+.env.local
+.env.*.local
+api_keys.txt
+config.local.*
+*_config_local.*
+006_setup_api_key_local.ps1
+006_setup_api_key_local.bat
+openai_key.txt
+
+# Frontend build files
+frontend/build/
+frontend/node_modules/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Output directories
+output/
+generated/
+
 # macOS Files
 .DS_Store
 
