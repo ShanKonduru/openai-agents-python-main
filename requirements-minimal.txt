@@ -1,0 +1,38 @@
+# Minimal OpenAI Agents SDK Dependencies (Compatibility Mode)
+# This version avoids conflicts with existing packages like instructor, langchain-openai, chromadb
+
+# Core dependencies - using compatible versions
+pydantic>=2.10,<3
+griffe>=1.5.6,<2
+typing-extensions>=4.12.2,<5
+requests>=2.0,<3
+types-requests>=2.0,<3
+
+# Note: OpenAI client is already installed in environment (conflicting version)
+# The agents SDK officially requires openai>=2.2 but your environment has packages
+# that require openai<2.0.0. You may need to upgrade those packages or use
+# the agents SDK with the existing OpenAI client version (compatibility not guaranteed)
+
+# PostHog - compatible version for both ChromaDB and traceloop-sdk
+# ChromaDB requires posthog<6.0.0,>=2.4.0
+# traceloop-sdk requires posthog<4,>3.0.2
+posthog>=3.0.2,<4.0.0
+
+# Optional dependencies that are safe to install
+numpy>=2.2.0,<3; python_version>='3.10'
+websockets>=15.0,<16
+graphviz>=0.17
+SQLAlchemy>=2.0
+asyncpg>=0.29.0
+cryptography>=45.0,<46
+redis>=6.4.0
+
+# Development dependencies (safe to install)
+pytest
+pytest-asyncio
+pytest-mock>=3.14.0
+rich>=13.1.0,<14
+coverage>=7.6.12
+inline-snapshot>=0.20.7
+aiosqlite>=0.21.0
+fakeredis>=2.31.3
