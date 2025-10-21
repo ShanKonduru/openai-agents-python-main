@@ -23,7 +23,7 @@ if not exist "%API_KEY_FILE%" (
     echo 🔒 SECURITY: The '%API_KEY_FILE%' file is excluded from git commits.
     echo    Your API key will NEVER be accidentally pushed to GitHub!
     echo.
-    pause
+    timeout /t 3 /nobreak >nul
     exit /b 1
 )
 
@@ -35,7 +35,7 @@ if "%OPENAI_API_KEY%"=="" (
     echo ❌ API key file is empty: %API_KEY_FILE%
     echo    Make sure the file contains your OpenAI API key
     echo.
-    pause
+    timeout /t 3 /nobreak >nul
     exit /b 1
 )
 
@@ -45,7 +45,7 @@ if %ERRORLEVEL% neq 0 (
     echo ❌ Invalid API key format in %API_KEY_FILE%
     echo    OpenAI API keys should start with 'sk-'
     echo.
-    pause
+    timeout /t 3 /nobreak >nul
     exit /b 1
 )
 
@@ -63,4 +63,3 @@ echo 💡 To make it permanent, add OPENAI_API_KEY to your system environment va
 echo.
 echo 🔒 SECURITY: Your API key is stored in '%API_KEY_FILE%' ^(excluded from git^)
 echo.
-pause

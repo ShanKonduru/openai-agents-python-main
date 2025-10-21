@@ -9,7 +9,7 @@ if "%OPENAI_API_KEY%"=="" (
     call 006_setup_api_key.bat
     if %ERRORLEVEL% neq 0 (
         echo ❌ API key setup failed
-        pause
+        timeout /t 3 /nobreak >nul
         exit /b 1
     )
 )

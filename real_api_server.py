@@ -6,6 +6,8 @@ Uses actual OpenAI API for content generation
 import asyncio
 import concurrent.futures
 import json
+import re
+import tempfile
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -487,9 +489,38 @@ Provide:
         print(f"✅ SEO optimization completed: {len(seo_result)} characters")
         
         # Create final result
+        # Generate HTML version of the content
+        html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{input_data.topic}</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }}
+        h1, h2, h3 {{ color: #333; }}
+        code {{ background-color: #f4f4f4; padding: 2px 4px; border-radius: 3px; }}
+        pre {{ background-color: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }}
+        blockquote {{ border-left: 4px solid #ddd; margin: 0; padding-left: 20px; color: #666; }}
+    </style>
+</head>
+<body>
+{article_result}
+</body>
+</html>"""
+        
+        # Create URL-friendly slug
+        import re
+        url_slug = re.sub(r'[^a-zA-Z0-9\s-]', '', input_data.topic.lower())
+        url_slug = re.sub(r'\s+', '-', url_slug.strip())
+        url_slug = url_slug[:50]  # Limit length
+        
         final_result = {
             "title": f"AI-Generated Guide: {input_data.topic}",
-            "content": article_result,
+            "content": article_result,  # Keep original for backward compatibility
+            "markdown_content": article_result,  # Markdown version
+            "html_content": html_content,  # HTML version
+            "article_url_slug": url_slug,  # For filename generation
             "word_count": len(article_result.split()),
             "research_data": research_result,
             "structure_outline": structure_result,
@@ -528,7 +559,7 @@ async def get_task_status(task_id: str):
 
 @app.get("/api/content/download/{task_id}")
 async def download_content(task_id: str):
-    """Download the completed content"""
+    """Download the completed content (legacy endpoint)"""
     if task_id not in task_storage:
         raise HTTPException(status_code=404, detail="Task not found")
     
@@ -537,6 +568,44 @@ async def download_content(task_id: str):
         raise HTTPException(status_code=400, detail="Content not ready for download")
     
     return task_status.final_result
+
+@app.get("/api/content/download/{task_id}/{format}")
+async def download_content_format(task_id: str, format: str):
+    """Download content in specific format (markdown or html)"""
+    if task_id not in task_storage:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    task_status = task_storage[task_id]
+    if task_status.status != "completed" or not task_status.final_result:
+        raise HTTPException(status_code=400, detail="Content not ready for download")
+    
+    result = task_status.final_result
+    
+    if format.lower() == "markdown":
+        content = result.get("markdown_content", result.get("content", ""))
+        filename = f"{result.get('article_url_slug', 'article')}.md"
+        media_type = "text/markdown"
+    elif format.lower() == "html":
+        content = result.get("html_content", "")
+        filename = f"{result.get('article_url_slug', 'article')}.html"
+        media_type = "text/html"
+    else:
+        raise HTTPException(status_code=400, detail="Invalid format. Use 'markdown' or 'html'")
+    
+    if not content or content.strip() == "":
+        raise HTTPException(status_code=404, detail=f"No {format} content available")
+    
+    # Create a temporary file and return it
+    temp_file = tempfile.NamedTemporaryFile(mode='w', delete=False, suffix=f'.{format}', encoding='utf-8')
+    temp_file.write(content)
+    temp_file.close()
+    
+    return FileResponse(
+        path=temp_file.name,
+        filename=filename,
+        media_type=media_type,
+        background=None  # Don't delete immediately
+    )
 
 if __name__ == "__main__":
     print("🤖 Starting AI Content Creation System...")
