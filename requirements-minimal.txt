@@ -36,3 +36,5 @@ coverage>=7.6.12
 inline-snapshot>=0.20.7
 aiosqlite>=0.21.0
 fakeredis>=2.31.3
+
+fastapis

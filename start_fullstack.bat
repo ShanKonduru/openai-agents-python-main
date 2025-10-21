@@ -9,7 +9,7 @@ if "%OPENAI_API_KEY%"=="" (
     call 006_setup_api_key.bat
     if %ERRORLEVEL% neq 0 (
         echo ❌ API key setup failed
-        pause
+        timeout /t 3 /nobreak >nul
         exit /b 1
     )
 )
@@ -24,7 +24,7 @@ if exist ".venv\Scripts\activate.bat" (
 )
 
 echo 🖥️  Starting Backend Server...
-start "Content Creation API" cmd /k "call .venv\Scripts\activate.bat && python api_server.py"
+start "Content Creation API" cmd /k "call .venv\Scripts\activate.bat && python real_api_server.py"
 
 echo ⏳ Waiting for backend to start...
 timeout /t 5 /nobreak >nul
@@ -46,4 +46,4 @@ echo.
 echo 💡 Both servers are running in separate windows.
 echo    Close those windows to stop the servers.
 echo.
-pause
+echo ⚡ Startup complete! Check the opened windows for server status.
